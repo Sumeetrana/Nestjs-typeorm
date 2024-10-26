@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Profile } from 'src/typeorm/entities/Profile.enitity';
 import { User } from 'src/typeorm/entities/User.entity';
 
 @Module({
@@ -14,7 +15,7 @@ import { User } from 'src/typeorm/entities/User.entity';
         username: configService.getOrThrow('POSTGRES_USER'),
         password: configService.getOrThrow('POSTGRES_PASSWORD'),
         // autoLoadEntities: true,
-        entities: [User],
+        entities: [User, Profile],
         synchronize: configService.getOrThrow('POSTGRESQL_SYNCHRONIZE'),
       }),
       inject: [ConfigService],
