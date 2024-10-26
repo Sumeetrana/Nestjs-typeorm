@@ -1,9 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Post } from 'src/typeorm/entities/Post.entity';
 import { Profile } from 'src/typeorm/entities/Profile.enitity';
 import { User } from 'src/typeorm/entities/User.entity';
 import {
   CreateUserParams,
+  CreateUserPostParams,
   CreateUserProfileParams,
   UpdateUserParams,
 } from 'src/users/utils/types';
@@ -15,10 +17,11 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Profile)
     private userProfileRepository: Repository<Profile>,
+    @InjectRepository(Post) private userPostRespository: Repository<Post>,
   ) {}
 
   fetchUsers() {
-    return this.userRepository.find({ relations: ['profile'] });
+    return this.userRepository.find({ relations: ['profile', 'posts'] });
   }
 
   createUser(userDetails: CreateUserParams) {
@@ -48,5 +51,15 @@ export class UsersService {
 
     user.profile = savedProfile;
     return this.userRepository.save(user);
+  }
+
+  async createUserPost(id: number, userPostDetails: CreateUserPostParams) {
+    const user = await this.userRepository.findOneBy({ id });
+
+    const newPost = this.userPostRespository.create({
+      ...userPostDetails,
+      user,
+    });
+    return await this.userPostRespository.save(newPost);
   }
 }
